@@ -61,8 +61,12 @@ def save_to_markdown(articles: list[dict], summary: str, topic: str = "news"):
 
 
 async def save_node(state: GraphState) -> GraphState:
-    save_to_markdown(
-        articles=parse_raw_articles("\n".join(state["articles"])),
-        summary=state["summary"],
-    )
+    articles = parse_raw_articles("\n".join(state.get("articles", [])))
+    summary = state.get("summary", "").strip()
+
+    if articles and summary:
+        save_to_markdown(
+            articles=articles,
+            summary=summary,
+        )
     return state  # 상태 그대로 반환 (종단 노드로 사용 가능)
