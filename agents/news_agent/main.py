@@ -29,26 +29,24 @@ async def run_news_agent(query: str):
 
 
 async def main():
-    logger.info("🗞️ Interactive News Agent. Type 'exit' to quit.\n")
-
+    print("🗞️  Interactive News Agent. Type 'bye', 'exit' or 'quit' to quit.")
     while True:
-        user_input = input("🗣️ Question: ").strip()
+        print("🗣️  Question: ")
+        user_input = input().strip()
+
         if user_input.lower() in ("bye", "exit", "quit"):
-            print("👋 Goodbye!")
+            print("👋  Goodbye!")
             break
 
         result = await run_news_agent(user_input)
+        # memory 업데이트
+        memory.chat_memory.add_user_message(user_input)
+        memory.chat_memory.add_ai_message(result)
 
-        if result and result.get("articles"):
-            summary = result["summary"]
+        followup = conversation.predict(input=f"{user_input}")
+        clean_followup = remove_think_blocks(followup)
 
-            # memory 업데이트
-            memory.chat_memory.add_user_message(user_input)
-            memory.chat_memory.add_ai_message(summary)
-
-            followup = conversation.predict(input=f"{user_input}")
-            clean_followup = remove_think_blocks(followup)
-            logger.info(f"[🤖 Follow-up] {clean_followup}")
+        print(f"🤖  Follow-up: {clean_followup}")
 
 
 if __name__ == "__main__":
